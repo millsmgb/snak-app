@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
 
-// Replace with your deployed contract address and ABI
 const CONTRACT_ADDRESS = '0x36C02dA8a0983159322a80FFE9F24b1acfF8B570';
 const CONTRACT_ABI = [
   {
@@ -611,14 +610,12 @@ const CONTRACT_ABI = [
   }
 ];
 
-export default function Home() {
+export default function MintPage() {
   const [provider, setProvider] = useState(null);
   const [signer, setSigner] = useState(null);
   const [contract, setContract] = useState(null);
   const [account, setAccount] = useState('');
-  const [stakeAmount, setStakeAmount] = useState('');
-  const [stakedBalance, setStakedBalance] = useState('0');
-  const [pendingRewards, setPendingRewards] = useState('0');
+  const [ethAmount, setEthAmount] = useState('');
 
   useEffect(() => {
     if (typeof window !== 'undefined' && window.ethereum) {
@@ -635,46 +632,37 @@ export default function Home() {
     setSigner(signer);
     const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
     setContract(contract);
-    fetchUserData(contract, user);
   };
 
-  const fetchUserData = async (contractInstance, userAddress) => {
-    const stake = await contractInstance.stakes(userAddress);
-    const rewards = await contractInstance.pendingRewards(userAddress);
-    setStakedBalance(ethers.formatUnits(stake.amount, 18));
-    setPendingRewards(ethers.formatUnits(rewards, 18));
-  };
-
-  const handleStake = async () => {
-    const tx = await contract.stake(ethers.parseUnits(stakeAmount, 18));
+  const handleMint = async () => {
+    const value = ethers.parseEther(ethAmount);
+    const tokenAmount = value * BigInt(1000); // 1 ETH = 1000 TOKEN example rate
+    const tx = await contract.mint(account, tokenAmount);
     await tx.wait();
-    fetchUserData(contract, account);
-  };
-
-  const handleWithdraw = async () => {
-    const tx = await contract.withdraw(ethers.parseUnits(stakeAmount, 18));
-    await tx.wait();
-    fetchUserData(contract, account);
+    alert('Tokens minted!');
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4">
-      <h1 className="text-3xl font-bold mb-6">Staking Dashboard</h1>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4">
+      <h1 className="text-2xl font-bold mb-6">Mint Stakeable Tokens</h1>
       {!account ? (
-        <button onClick={connectWallet} className="px-4 py-2 bg-blue-600 text-white rounded">Connect MetaMask</button>
+        <button onClick={connectWallet} className="px-4 py-2 bg-blue-600 text-white rounded">Connect Wallet</button>
       ) : (
-        <div className="w-full max-w-md bg-white p-6 rounded shadow">
-          <p><strong>Connected Account:</strong> {account}</p>
-          <p><strong>Staked Balance:</strong> {stakedBalance} TOKEN</p>
-          <p><strong>Pending Rewards:</strong> {pendingRewards} TOKEN</p>
-
-          <div className="mt-4">
-            <input type="text" value={stakeAmount} onChange={e => setStakeAmount(e.target.value)} placeholder="Amount" className="border p-2 w-full rounded" />
-            <div className="flex justify-between mt-2">
-              <button onClick={handleStake} className="px-4 py-2 bg-green-500 text-white rounded">Stake</button>
-              <button onClick={handleWithdraw} className="px-4 py-2 bg-red-500 text-white rounded">Withdraw</button>
-            </div>
-          </div>
+        <div className="bg-white p-6 rounded shadow w-full max-w-md">
+          <p className="mb-2">Connected: {account}</p>
+          <input
+            type="text"
+            value={ethAmount}
+            onChange={e => setEthAmount(e.target.value)}
+            placeholder="ETH Amount"
+            className="border p-2 w-full rounded mb-4"
+          />
+          <button
+            onClick={handleMint}
+            className="w-full px-4 py-2 bg-green-500 text-white rounded"
+          >
+            Mint Tokens
+          </button>
         </div>
       )}
     </div>
