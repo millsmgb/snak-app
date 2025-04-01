@@ -218,9 +218,15 @@ export default function MySnakes() {
                 <p><strong>Status:</strong> {snake.hatched ? 'Hatched' : 'Egg'}</p>
                 <p><strong>Color:</strong> {snake.color}</p>
                 <p><strong>Speckles:</strong> {snake.speckles}</p>
+
                 {snake.hatched ? (
                     <div className="flex flex-col items-center">
-                      <motion.img
+                      {hunger.opacity <= 0.2 ? (
+                        <div className="mt-2 border rounded">
+                        <span className="text-red-600 text-8xl font-bold">❌</span>
+                      </div>
+                      ): (
+                        <motion.img
                         initial={snake.id === justHatched ? { scale: 0.8, opacity: 0 } : false}
                         animate={snake.id === justHatched ? { scale: 1, opacity: 1 } : false}
                         transition={{ duration: 0.5, ease: 'easeOut' }}
@@ -229,12 +235,7 @@ export default function MySnakes() {
                         style={{ opacity: hunger.opacity }}
                         className="mt-2 border rounded"
                       />
-                      {hunger.overlay && (
-                        <div className="absolute inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center">
-                          <span className="text-5xl text-red-600 font-bold">✖</span>
-                        </div>
                       )}
-
                       <p className="text-sm text-center mt-2 font-medium">
                         Hunger Status: {
                           hunger.overlay
