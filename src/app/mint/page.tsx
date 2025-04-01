@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
 
-const CONTRACT_ADDRESS = '0x36C02dA8a0983159322a80FFE9F24b1acfF8B570';
+const CONTRACT_ADDRESS = process.env.SNAK_CONTRACT_ADDRESS;
 const CONTRACT_ABI = [
   {
     "inputs": [

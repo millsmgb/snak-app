@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { BrowserProvider, Contract } from 'ethers';
 import SnakeEggABI from '@/abis/SnakeEggNFT.json';
 
-const CONTRACT_ADDRESS = '0x809d550fca64d94Bd9F66E60752A544199cfAC3D';
+const CONTRACT_ADDRESS = process.env.SNEK_EGG_NFT_CONTRACT_ADDRESS;
 const HATCH_TIME_SECONDS = 600; // 10 minutes
 
 export default function MintPage() {

@@ -7,8 +7,8 @@ import ERC20ABI from '@/abis/Snak.json';
 import { motion } from 'framer-motion';
 import Confetti from 'react-confetti';
 
-const CONTRACT_ADDRESS = '0x809d550fca64d94Bd9F66E60752A544199cfAC3D';
-const TOKEN_ADDRESS = '0x36C02dA8a0983159322a80FFE9F24b1acfF8B570';
+const CONTRACT_ADDRESS = process.env.SNEK_EGG_NFT_CONTRACT_ADDRESS;
+const TOKEN_ADDRESS = process.env.SNAK_CONTRACT_ADDRESS;
 const HATCH_TIME_SECONDS = 600;
 const HUNGER_INTERVAL = 4 * 60 * 60; // 4 hours in seconds
 const STARVING_INTERVAL = 24 * 60 * 60; // 24 hours in seconds
@@ -91,27 +91,27 @@ export default function MySnakes() {
     if (!amount || isNaN(amount)) return alert('Enter a valid amount');
 
     if (amount < 10) return alert('Snek needs at least 10 snaks');
-  
+
     try {
       const token = new ethers.Contract(TOKEN_ADDRESS, ERC20ABI.abi, signer);
       const parsedAmount = ethers.parseUnits(amount, 18);
-  
+
       const owner = await contract.ownerOf(id);
       if (owner.toLowerCase() !== account.toLowerCase()) {
         alert('You do not own this snake.');
         return;
       }
-  
+
       const snake = await contract.snakes(id);
       if (!snake.hatched) {
         alert('Snake is not hatched yet.');
         return;
       }
-  
+
       const allowance = await token.allowance(account, CONTRACT_ADDRESS);
       console.log('Allowance:', allowance.toString());
       console.log('Parsed Amount:', parsedAmount.toString());
-  
+
       if (allowance < parsedAmount) {
         console.log('Approving token transfer...');
         const approveTx = await token.approve(CONTRACT_ADDRESS, parsedAmount);
@@ -119,7 +119,7 @@ export default function MySnakes() {
       } else {
         console.log('Sufficient allowance already set.');
       }
-  
+
       console.log('Feeding snake...');
       const tx = await contract.feed(id, parsedAmount);
       await tx.wait();
@@ -153,28 +153,28 @@ export default function MySnakes() {
       };
     }
   };
-  
+
 
   function generateSnakeSVG(color, speckles) {
     const bodySegments = Array.from({ length: 8 }).map((_, i) => {
       const cx = 20 + i * 10;
       const cy = 50 + Math.sin(i * 0.8) * 10;
       const base = `<circle cx='${cx}' cy='${cy}' r='6' fill='${color}' />`;
-  
+
       let overlay = '';
       if (speckles === 'dots') {
         overlay = `<circle cx='${cx - 2}' cy='${cy - 2}' r='1.2' fill='black' />`;
       } else if (speckles === 'stripes' && i % 2 === 0) {
         overlay = `<rect x='${cx - 3}' y='${cy - 6}' width='6' height='12' fill='black' />`;
       }
-  
+
       return `${base}${overlay}`;
     }).join('');
-  
+
     const head = `<circle cx='100' cy='50' r='8' fill='${color}' />`;
     const eyes = `<circle cx='97' cy='47' r='1.5' fill='white'/><circle cx='103' cy='47' r='1.5' fill='white'/><circle cx='97' cy='47' r='0.5' fill='black'/><circle cx='103' cy='47' r='0.5' fill='black'/>`;
     const tongue = `<path d='M100 58 Q100 65, 97 68 Q100 65, 103 68 Q100 65, 100 58' stroke='red' fill='red'/>`;
-  
+
     const svg = `
       <svg xmlns='http://www.w3.org/2000/svg' width='120' height='100'>
         ${bodySegments}
@@ -183,7 +183,7 @@ export default function MySnakes() {
         ${tongue}
       </svg>
     `.trim();
-  
+
     return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
   }
 
@@ -220,13 +220,13 @@ export default function MySnakes() {
                 <p><strong>Speckles:</strong> {snake.speckles}</p>
 
                 {snake.hatched ? (
-                    <div className="flex flex-col items-center">
-                      {hunger.opacity <= 0.2 ? (
-                        <div className="mt-2 border rounded">
+                  <div className="flex flex-col items-center">
+                    {hunger.opacity <= 0.2 ? (
+                      <div className="mt-2 border rounded">
                         <span className="text-red-600 text-8xl font-bold">❌</span>
                       </div>
-                      ): (
-                        <motion.img
+                    ) : (
+                      <motion.img
                         initial={snake.id === justHatched ? { scale: 0.8, opacity: 0 } : false}
                         animate={snake.id === justHatched ? { scale: 1, opacity: 1 } : false}
                         transition={{ duration: 0.5, ease: 'easeOut' }}
@@ -235,18 +235,18 @@ export default function MySnakes() {
                         style={{ opacity: hunger.opacity }}
                         className="mt-2 border rounded"
                       />
-                      )}
-                      <p className="text-sm text-center mt-2 font-medium">
-                        Hunger Status: {
-                          hunger.overlay
-                            ? 'Starving'
-                            : hunger.opacity >= 0.9
+                    )}
+                    <p className="text-sm text-center mt-2 font-medium">
+                      Hunger Status: {
+                        hunger.overlay
+                          ? 'Starving'
+                          : hunger.opacity >= 0.9
                             ? 'Full'
                             : hunger.opacity >= 0.6
-                            ? 'Hungry'
-                            : 'Very Hungry'
-                        }
-                      </p>
+                              ? 'Hungry'
+                              : 'Very Hungry'
+                      }
+                    </p>
                   </div>
                 ) : (
                   <div className="flex flex-col items-center">
@@ -269,7 +269,7 @@ export default function MySnakes() {
                   </div>
                 )}
                 {snake.hatched && (
-                    <div className="mt-4">
+                  <div className="mt-4">
                     <input
                       type="number"
                       placeholder="Amount to feed"

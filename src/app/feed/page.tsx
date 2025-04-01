@@ -5,8 +5,8 @@ import { ethers } from 'ethers';
 import SnakeEggABI from '@/abis/SnakeEggNFT.json';
 import ERC20ABI from '@/abis/Snak.json';
 
-const NFT_CONTRACT = '0x809d550fca64d94Bd9F66E60752A544199cfAC3D';
-const ERC20_ADDRESS = '0x5FbDB2315678afecb367f032d93F642f64180aa3';
+const NFT_CONTRACT = process.env.SNEK_EGG_NFT_CONTRACT_ADDRESS;
+const ERC20_ADDRESS = process.env.SNAK_CONTRACT_ADDRESS;
 
 export default function Feed() {
   const [provider, setProvider] = useState();
